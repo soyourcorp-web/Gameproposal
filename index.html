@@ -368,28 +368,23 @@
         // Storage keys
         const PROPOSALS_KEY = 'gameProposals';
         const AUTH_KEY = 'adminAuth';
-        // Configuration Google Sheets
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyEYjd1tHwI3RJ-FUNZwhGrA5aWHqs-jLqBFumWVCGlm8XIAznPmTrXpqzJXTqXc4pFEQ/exec';
-
-// Fonction pour envoyer les données à Google Sheets
-async function syncWithGoogleSheets(action, data) {
-    try {
-        const response = await fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action, ...data })
-        });
-        const result = await response.json();
-        return result.success;
-    } catch (error) {
-        console.error('Erreur sync Google Sheets:', error);
-        return false;
-    }
-}
+        
+        // Utility Functions
+        function loadProposals() {
+            try {
+                const stored = localStorage.getItem(PROPOSALS_KEY);
+                return stored ? JSON.parse(stored) : [];
+            } catch (error) {
+                console.error('Erreur chargement propositions:', error);
+                return [];
+            }
+        }
+        
         // App State
         let currentView = 'public';
-        let proposals = JSON.parse(localStorage.getItem(PROPOSALS_KEY) || '[]');
+        let proposals = loadProposals();
 
-        // Utility Functions
+        // More Utility Functions
         function showNotification(message, type = 'success') {
             const notification = document.getElementById('notification');
             notification.textContent = message;
@@ -402,10 +397,18 @@ async function syncWithGoogleSheets(action, data) {
         }
 
         function saveProposals() {
-    localStorage.setItem(PROPOSALS_KEY, JSON.stringify(proposals));
-    // Sync avec Google Sheets
-    syncWithGoogleSheets('add', proposals[proposals.length - 1]);
-}
+            localStorage.setItem(PROPOSALS_KEY, JSON.stringify(proposals));
+        }
+        
+        function loadProposals() {
+            try {
+                const stored = localStorage.getItem(PROPOSALS_KEY);
+                return stored ? JSON.parse(stored) : [];
+            } catch (error) {
+                console.error('Erreur chargement propositions:', error);
+                return [];
+            }
+        }
 
         function generateId() {
             return Date.now().toString(36) + Math.random().toString(36).substr(2);
@@ -499,8 +502,10 @@ async function syncWithGoogleSheets(action, data) {
 
         // Admin Dashboard View
         function renderAdminDashboard() {
-            const pendingProposals = proposals.filter(p => p.status === 'pending');
-            const acceptedProposals = proposals.filter(p => p.status === 'accepted');
+            // Filtrer les propositions valides uniquement
+            const validProposals = proposals.filter(p => p && p.status);
+            const pendingProposals = validProposals.filter(p => p.status === 'pending');
+            const acceptedProposals = validProposals.filter(p => p.status === 'accepted');
             
             return `
                 <div class="container" style="max-width: 1400px;">
@@ -521,7 +526,7 @@ async function syncWithGoogleSheets(action, data) {
                                 <div>Acceptées</div>
                             </div>
                             <div style="text-align: center; padding: 15px; background: #f8d7da; border-radius: 8px;">
-                                <div style="font-size: 2em; font-weight: bold;">${proposals.filter(p => p.status === 'rejected').length}</div>
+                                <div style="font-size: 2em; font-weight: bold;">${validProposals.filter(p => p.status === 'rejected').length}</div>
                                 <div>Refusées</div>
                             </div>
                         </div>
@@ -551,10 +556,10 @@ async function syncWithGoogleSheets(action, data) {
                         </div>
                     </div>
                     
-                    ${proposals.filter(p => p.status !== 'pending').length > 0 ? `
+                    ${validProposals.filter(p => p.status !== 'pending').length > 0 ? `
                         <h3 style="color: white; margin: 30px 0 20px;">📜 Historique</h3>
                         <div class="proposals-grid">
-                            ${proposals.filter(p => p.status !== 'pending')
+                            ${validProposals.filter(p => p.status !== 'pending')
                                 .map(proposal => renderProposalCard(proposal)).join('')}
                         </div>
                     ` : ''}
@@ -647,28 +652,41 @@ async function syncWithGoogleSheets(action, data) {
         }
 
         function acceptProposal(id) {
-    const proposal = proposals.find(p => p.id === id);
-    if (proposal) {
-        proposal.status = 'accepted';
-        saveProposals();
-        // Sync avec Google Sheets
-        syncWithGoogleSheets('update', { id, status: 'accepted', ...proposal });
-        render();
-        showNotification(`✅ Session avec ${proposal.pseudo} acceptée !`, 'success');
-    }
-}
+            const proposal = proposals.find(p => p && p.id === id);
+            if (proposal) {
+                proposal.status = 'accepted';
+                saveProposals();
+                render();
+                showNotification(`✅ Session avec ${proposal.pseudo} acceptée !`, 'success');
+                
+                // Ici vous pourrez ajouter l'intégration Discord
+                console.log('Discord notification:', {
+                    email: proposal.email,
+                    message: `Votre proposition pour jouer à ${proposal.gameName} le ${formatDate(proposal.date)} a été acceptée !`
+                });
+            } else {
+                showNotification('❌ Proposition introuvable', 'error');
+            }
+        }
 
-function rejectProposal(id) {
-    const proposal = proposals.find(p => p.id === id);
-    if (proposal) {
-        proposal.status = 'rejected';
-        saveProposals();
-        // Sync avec Google Sheets
-        syncWithGoogleSheets('update', { id, status: 'rejected', ...proposal });
-        render();
-        showNotification(`Session avec ${proposal.pseudo} refusée`, 'success');
-    }
-}
+        function rejectProposal(id) {
+            const proposal = proposals.find(p => p && p.id === id);
+            if (proposal) {
+                proposal.status = 'rejected';
+                saveProposals();
+                render();
+                showNotification(`Session avec ${proposal.pseudo} refusée`, 'success');
+                
+                // Ici vous pourrez ajouter l'intégration Discord
+                console.log('Discord notification:', {
+                    email: proposal.email,
+                    message: `Votre proposition pour jouer à ${proposal.gameName} n'a pas pu être acceptée cette fois.`
+                });
+            } else {
+                showNotification('❌ Proposition introuvable', 'error');
+            }
+        }
+
         function logout() {
             setAuthenticated(false);
             showPublicForm();
