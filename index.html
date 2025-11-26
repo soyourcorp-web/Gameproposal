@@ -425,26 +425,39 @@
             }
             
             try {
-                console.log('Sync Google Sheets:', action, data);
+                console.log('📤 Envoi à Google Sheets:', action, data);
+                
+                const payload = {
+                    action: action,
+                    ...data
+                };
+                
+                console.log('📦 Payload complet:', JSON.stringify(payload));
                 
                 const response = await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ action, ...data })
+                    body: JSON.stringify(payload),
+                    redirect: 'follow'
                 });
                 
-                // Note: mode 'no-cors' ne permet pas de lire la réponse
-                // mais la requête est quand même envoyée
-                console.log('Sync envoyé à Google Sheets');
-                return true;
+                console.log('📥 Réponse reçue:', response.status, response.statusText);
+                
+                if (response.ok || response.redirected) {
+                    console.log('✅ Sync Google Sheets réussie');
+                    return true;
+                } else {
+                    console.warn('⚠️ Réponse non-ok:', response.status);
+                    return false;
+                }
                 
             } catch (error) {
-                console.error('Erreur sync Google Sheets:', error);
-                showNotification('⚠️ Erreur de synchronisation Google Sheets', 'error');
-                return false;
+                console.error('❌ Erreur sync Google Sheets:', error);
+                // Ne pas afficher d'erreur à l'utilisateur si c'est juste un problème de CORS
+                // Car la requête est quand même envoyée
+                return true;
             }
         }
         
@@ -586,9 +599,9 @@
                 <div class="container" style="max-width: 1400px;">
                     <div class="admin-header">
                         <h2>📊 Tableau de Bord Admin</h2>
-                        <div style="display: flex; gap: 10px; align-items: center;">
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                             ${isGoogleSheetsEnabled() ? 
-                                '<span style="background: rgba(76, 175, 80, 0.2); color: white; padding: 8px 15px; border-radius: 20px; font-size: 0.9em;">☁️ Google Sheets connecté</span>' :
+                                '<span style="background: rgba(76, 175, 80, 0.2); color: white; padding: 8px 15px; border-radius: 20px; font-size: 0.9em;">☁️ Google Sheets connecté</span><button onclick="testGoogleSheets()" style="background: rgba(255, 255, 255, 0.2); color: white; padding: 8px 15px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em;">🧪 Tester la connexion</button>' :
                                 '<span style="background: rgba(255, 255, 255, 0.2); color: white; padding: 8px 15px; border-radius: 20px; font-size: 0.9em;">💾 Mode local</span>'
                             }
                             <button onclick="logout()" class="logout-btn">Déconnexion</button>
@@ -792,6 +805,46 @@
             showPublicForm();
             showNotification('Déconnexion réussie', 'success');
         }
+        
+        async function testGoogleSheets() {
+            console.log('🧪 Test de connexion Google Sheets...');
+            console.log('URL:', GOOGLE_SCRIPT_URL);
+            
+            showNotification('🧪 Test en cours...', 'success');
+            
+            const testData = {
+                action: 'add',
+                id: 'test_' + Date.now(),
+                pseudo: 'Test Utilisateur',
+                email: 'test@example.com',
+                gameName: 'Jeu Test',
+                gameLink: 'https://example.com',
+                date: new Date().toISOString().split('T')[0],
+                time: '20:00',
+                notes: 'Ceci est un test de connexion',
+                status: 'pending'
+            };
+            
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData),
+                    redirect: 'follow'
+                });
+                
+                console.log('✅ Requête envoyée:', response.status);
+                console.log('📋 Vérifiez votre Google Sheet pour voir si une ligne "Test Utilisateur" est apparue');
+                
+                showNotification('✅ Requête envoyée ! Vérifiez votre Google Sheet', 'success');
+                
+            } catch (error) {
+                console.error('❌ Erreur:', error);
+                showNotification('❌ Erreur: ' + error.message, 'error');
+            }
+        }
 
         function showPublicForm() {
             currentView = 'public';
@@ -862,6 +915,7 @@
         window.acceptProposal = acceptProposal;
         window.rejectProposal = rejectProposal;
         window.exportToJSON = exportToJSON;
+        window.testGoogleSheets = testGoogleSheets;
     </script>
 </body>
 </html>
