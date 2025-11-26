@@ -364,7 +364,10 @@
     <script>
         // Configuration
         const ADMIN_PASSWORD = 'elbe2024'; // Changez ce mot de passe !
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/u/0/home/projects/15gImaf-bjpLgepgJ5Jnr72zsORniOgVY2ZFiPzpojOSJtivMPQZmGNa4/edit';
+        
+        // Configuration Google Sheets (OPTIONNEL - laissez vide pour utiliser localStorage uniquement)
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDB-kvjq-9smOJgJp8sfW8mYsB84LKBGQyZrfqEyUB/dev'; // Collez ici l'URL de votre Apps Script
+        
         // Storage keys
         const PROPOSALS_KEY = 'gameProposals';
         const AUTH_KEY = 'adminAuth';
@@ -398,6 +401,78 @@
 
         function saveProposals() {
             localStorage.setItem(PROPOSALS_KEY, JSON.stringify(proposals));
+        }
+        
+        // ==========================================
+        // INTÉGRATION GOOGLE SHEETS
+        // ==========================================
+        
+        /**
+         * Vérifie si Google Sheets est configuré
+         */
+        function isGoogleSheetsEnabled() {
+            return GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.length > 0 && 
+                   GOOGLE_SCRIPT_URL !== 'VOTRE_URL_APPS_SCRIPT_ICI';
+        }
+        
+        /**
+         * Synchronise avec Google Sheets
+         */
+        async function syncWithGoogleSheets(action, data) {
+            if (!isGoogleSheetsEnabled()) {
+                console.log('Google Sheets non configuré - utilisation de localStorage uniquement');
+                return true;
+            }
+            
+            try {
+                console.log('Sync Google Sheets:', action, data);
+                
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ action, ...data })
+                });
+                
+                // Note: mode 'no-cors' ne permet pas de lire la réponse
+                // mais la requête est quand même envoyée
+                console.log('Sync envoyé à Google Sheets');
+                return true;
+                
+            } catch (error) {
+                console.error('Erreur sync Google Sheets:', error);
+                showNotification('⚠️ Erreur de synchronisation Google Sheets', 'error');
+                return false;
+            }
+        }
+        
+        /**
+         * Charge les propositions depuis Google Sheets
+         */
+        async function loadFromGoogleSheets() {
+            if (!isGoogleSheetsEnabled()) {
+                return null;
+            }
+            
+            try {
+                console.log('Chargement depuis Google Sheets...');
+                
+                const response = await fetch(GOOGLE_SCRIPT_URL + '?action=fetch', {
+                    method: 'GET',
+                    mode: 'no-cors'
+                });
+                
+                // En mode no-cors, on ne peut pas lire la réponse
+                // Les données doivent être chargées via localStorage
+                console.log('Tentative de chargement Google Sheets');
+                return null;
+                
+            } catch (error) {
+                console.error('Erreur chargement Google Sheets:', error);
+                return null;
+            }
         }
         
         function loadProposals() {
@@ -511,7 +586,13 @@
                 <div class="container" style="max-width: 1400px;">
                     <div class="admin-header">
                         <h2>📊 Tableau de Bord Admin</h2>
-                        <button onclick="logout()" class="logout-btn">Déconnexion</button>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            ${isGoogleSheetsEnabled() ? 
+                                '<span style="background: rgba(76, 175, 80, 0.2); color: white; padding: 8px 15px; border-radius: 20px; font-size: 0.9em;">☁️ Google Sheets connecté</span>' :
+                                '<span style="background: rgba(255, 255, 255, 0.2); color: white; padding: 8px 15px; border-radius: 20px; font-size: 0.9em;">💾 Mode local</span>'
+                            }
+                            <button onclick="logout()" class="logout-btn">Déconnexion</button>
+                        </div>
                     </div>
                     
                     <div class="card" style="margin-bottom: 30px;">
@@ -631,6 +712,9 @@
             proposals.push(proposal);
             saveProposals();
             
+            // Synchroniser avec Google Sheets si configuré
+            syncWithGoogleSheets('add', proposal);
+            
             showNotification('✅ Proposition envoyée avec succès !', 'success');
             document.getElementById('proposalForm').reset();
             
@@ -656,14 +740,22 @@
             if (proposal) {
                 proposal.status = 'accepted';
                 saveProposals();
+                
+                // Synchroniser avec Google Sheets si configuré
+                syncWithGoogleSheets('update', {
+                    id: proposal.id,
+                    status: 'accepted',
+                    pseudo: proposal.pseudo,
+                    gameName: proposal.gameName,
+                    date: proposal.date,
+                    time: proposal.time
+                });
+                
                 render();
                 showNotification(`✅ Session avec ${proposal.pseudo} acceptée !`, 'success');
                 
-                // Ici vous pourrez ajouter l'intégration Discord
-                console.log('Discord notification:', {
-                    email: proposal.email,
-                    message: `Votre proposition pour jouer à ${proposal.gameName} le ${formatDate(proposal.date)} a été acceptée !`
-                });
+                // Log pour debug
+                console.log('Proposition acceptée:', proposal);
             } else {
                 showNotification('❌ Proposition introuvable', 'error');
             }
@@ -674,14 +766,22 @@
             if (proposal) {
                 proposal.status = 'rejected';
                 saveProposals();
+                
+                // Synchroniser avec Google Sheets si configuré
+                syncWithGoogleSheets('update', {
+                    id: proposal.id,
+                    status: 'rejected',
+                    pseudo: proposal.pseudo,
+                    gameName: proposal.gameName,
+                    date: proposal.date,
+                    time: proposal.time
+                });
+                
                 render();
                 showNotification(`Session avec ${proposal.pseudo} refusée`, 'success');
                 
-                // Ici vous pourrez ajouter l'intégration Discord
-                console.log('Discord notification:', {
-                    email: proposal.email,
-                    message: `Votre proposition pour jouer à ${proposal.gameName} n'a pas pu être acceptée cette fois.`
-                });
+                // Log pour debug
+                console.log('Proposition refusée:', proposal);
             } else {
                 showNotification('❌ Proposition introuvable', 'error');
             }
