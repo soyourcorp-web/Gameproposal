@@ -366,7 +366,7 @@
         const ADMIN_PASSWORD = 'elbe2024'; // Changez ce mot de passe !
         
         // Configuration Google Sheets (OPTIONNEL - laissez vide pour utiliser localStorage uniquement)
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDB-kvjq-9smOJgJp8sfW8mYsB84LKBGQyZrfqEyUB/exec'; // Collez ici l'URL de votre Apps Script
+        const GOOGLE_SCRIPT_URL = ''; // Collez ici l'URL de votre Apps Script
         
         // Storage keys
         const PROPOSALS_KEY = 'gameProposals';
@@ -416,7 +416,8 @@
         }
         
         /**
-         * Synchronise avec Google Sheets
+         * Synchronise avec Google Sheets en utilisant un formulaire caché
+         * (Contourne les problèmes CORS)
          */
         async function syncWithGoogleSheets(action, data) {
             if (!isGoogleSheetsEnabled()) {
@@ -425,39 +426,49 @@
             }
             
             try {
-                console.log('📤 Envoi à Google Sheets:', action, data);
+                console.log('📤 Envoi à Google Sheets via formulaire:', action, data);
                 
                 const payload = {
                     action: action,
                     ...data
                 };
                 
-                console.log('📦 Payload complet:', JSON.stringify(payload));
+                // Créer un formulaire caché et l'envoyer
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = GOOGLE_SCRIPT_URL;
+                form.target = 'hidden_iframe_' + Date.now();
+                form.style.display = 'none';
                 
-                const response = await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload),
-                    redirect: 'follow'
-                });
+                // Créer un iframe caché pour recevoir la réponse
+                const iframe = document.createElement('iframe');
+                iframe.name = form.target;
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
                 
-                console.log('📥 Réponse reçue:', response.status, response.statusText);
+                // Ajouter les données au formulaire
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'data';
+                input.value = JSON.stringify(payload);
+                form.appendChild(input);
                 
-                if (response.ok || response.redirected) {
-                    console.log('✅ Sync Google Sheets réussie');
-                    return true;
-                } else {
-                    console.warn('⚠️ Réponse non-ok:', response.status);
-                    return false;
-                }
+                document.body.appendChild(form);
+                form.submit();
+                
+                console.log('✅ Formulaire envoyé à Google Sheets');
+                
+                // Nettoyer après 2 secondes
+                setTimeout(() => {
+                    document.body.removeChild(form);
+                    document.body.removeChild(iframe);
+                }, 2000);
+                
+                return true;
                 
             } catch (error) {
                 console.error('❌ Erreur sync Google Sheets:', error);
-                // Ne pas afficher d'erreur à l'utilisateur si c'est juste un problème de CORS
-                // Car la requête est quand même envoyée
-                return true;
+                return true; // Ne pas bloquer l'utilisateur
             }
         }
         
