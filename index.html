@@ -686,6 +686,234 @@
                 height: 25px;
             }
         }
+
+        /* Modale cyberpunk */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal {
+            background: rgba(10, 20, 30, 0.95);
+            border: 2px solid #00b4db;
+            max-width: 700px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 
+                0 0 60px rgba(0, 180, 219, 0.4),
+                inset 0 0 80px rgba(0, 180, 219, 0.05);
+            animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: scale(0.8) translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 30px;
+            border-bottom: 1px solid rgba(0, 180, 219, 0.3);
+            position: relative;
+        }
+
+        .modal-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #00b4db, transparent);
+        }
+
+        .modal-header h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #00b4db;
+            font-size: 1.5em;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .modal-subheader {
+            color: #8b9ca8;
+            font-size: 1.1em;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: transparent;
+            border: 2px solid #ff4444;
+            color: #ff4444;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1.5em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 68, 68, 0.1);
+            box-shadow: 0 0 20px rgba(255, 68, 68, 0.4);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .modal-section {
+            margin-bottom: 30px;
+        }
+
+        .modal-section-title {
+            color: #00b4db;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1em;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 180, 219, 0.2);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            background: rgba(0, 180, 219, 0.05);
+            border-left: 2px solid #00b4db;
+            padding: 15px;
+        }
+
+        .info-label {
+            color: #00b4db;
+            font-size: 0.85em;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #ffffff;
+            font-size: 1.1em;
+        }
+
+        .modal-form-group {
+            margin-bottom: 25px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(0, 180, 219, 0.2);
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid;
+            background: transparent;
+            cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 1em;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn-accept {
+            color: #00ff88;
+            border-color: #00ff88;
+        }
+
+        .modal-btn-accept:hover {
+            background: rgba(0, 255, 136, 0.1);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.4);
+        }
+
+        .modal-btn-reject {
+            color: #ff4444;
+            border-color: #ff4444;
+        }
+
+        .modal-btn-reject:hover {
+            background: rgba(255, 68, 68, 0.1);
+            box-shadow: 0 0 30px rgba(255, 68, 68, 0.4);
+        }
+
+        .modal-btn-cancel {
+            color: #8b9ca8;
+            border-color: #8b9ca8;
+        }
+
+        .modal-btn-cancel:hover {
+            background: rgba(139, 156, 168, 0.1);
+        }
+
+        .char-count {
+            text-align: right;
+            color: #8b9ca8;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+
+        /* Message preview */
+        .message-preview {
+            background: rgba(0, 180, 219, 0.05);
+            border: 1px solid rgba(0, 180, 219, 0.2);
+            padding: 20px;
+            margin-top: 15px;
+            font-style: italic;
+            color: #8b9ca8;
+        }
+
+        .message-preview strong {
+            color: #00b4db;
+        }
     </style>
 </head>
 <body>
@@ -701,7 +929,7 @@
     <script>
         // Configuration
         const ADMIN_PASSWORD = 'elbe2024';
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDB-kvjq-9smOJgJp8sfW8mYsB84LKBGQyZrfqEyUB/exec'; // Collez votre URL ici
+        const GOOGLE_SCRIPT_URL = ''; // Collez votre URL ici
         
         // Storage keys
         const PROPOSALS_KEY = 'gameProposals';
@@ -1059,42 +1287,339 @@
 
         function acceptProposal(id) {
             const proposal = proposals.find(p => p && p.id === id);
-            if (proposal) {
-                proposal.status = 'accepted';
-                saveProposals();
-                syncWithGoogleSheets('update', {
-                    id: proposal.id,
-                    status: 'accepted',
-                    pseudo: proposal.pseudo,
-                    gameName: proposal.gameName,
-                    date: proposal.date,
-                    time: proposal.time
-                });
-                render();
-                showNotification(`✅ Session avec ${proposal.pseudo} acceptée !`, 'success');
-            } else {
+            if (!proposal) {
                 showNotification('❌ Proposition introuvable', 'error');
+                return;
             }
+            
+            showAcceptModal(proposal);
         }
 
         function rejectProposal(id) {
             const proposal = proposals.find(p => p && p.id === id);
-            if (proposal) {
-                proposal.status = 'rejected';
-                saveProposals();
-                syncWithGoogleSheets('update', {
-                    id: proposal.id,
-                    status: 'rejected',
-                    pseudo: proposal.pseudo,
-                    gameName: proposal.gameName,
-                    date: proposal.date,
-                    time: proposal.time
-                });
-                render();
-                showNotification(`Session avec ${proposal.pseudo} refusée`, 'success');
-            } else {
+            if (!proposal) {
                 showNotification('❌ Proposition introuvable', 'error');
+                return;
             }
+            
+            showRejectModal(proposal);
+        }
+        
+        function showAcceptModal(proposal) {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay active';
+            modal.id = 'acceptModal';
+            
+            modal.innerHTML = `
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3>✅ Accepter la proposition</h3>
+                        <div class="modal-subheader">Personnalisez les détails avant validation</div>
+                        <button class="modal-close" onclick="closeModal('acceptModal')">×</button>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <div class="modal-section">
+                            <div class="modal-section-title">📋 Informations du joueur</div>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">Pseudo</div>
+                                    <div class="info-value">${proposal.pseudo}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Email</div>
+                                    <div class="info-value">${proposal.email}</div>
+                                </div>
+                                <div class="info-item" style="grid-column: 1 / -1;">
+                                    <div class="info-label">Jeu</div>
+                                    <div class="info-value">${proposal.gameName}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="modal-section">
+                            <div class="modal-section-title">📅 Modifier la session</div>
+                            
+                            <div class="modal-form-group">
+                                <label>DATE PROPOSÉE</label>
+                                <input type="date" id="modal-accept-date" value="${proposal.date}">
+                            </div>
+                            
+                            <div class="modal-form-group">
+                                <label>HORAIRE</label>
+                                <input type="time" id="modal-accept-time" value="${proposal.time}">
+                            </div>
+                        </div>
+                        
+                        <div class="modal-section">
+                            <div class="modal-section-title">✉️ Message de confirmation</div>
+                            
+                            <div class="modal-form-group">
+                                <label>MESSAGE PERSONNALISÉ</label>
+                                <textarea id="modal-accept-message" rows="5" maxlength="500">Salut ${proposal.pseudo} !
+
+Ta proposition pour jouer à ${proposal.gameName} a été acceptée ! 🎮
+
+Rendez-vous le [DATE] à [HEURE].
+
+À bientôt !</textarea>
+                                <div class="char-count"><span id="accept-char-count">0</span>/500</div>
+                            </div>
+                            
+                            <div class="message-preview" id="accept-preview">
+                                <strong>Aperçu :</strong><br>
+                                Le message sera envoyé à ${proposal.email}
+                            </div>
+                        </div>
+                        
+                        <div class="modal-actions">
+                            <button class="modal-btn modal-btn-cancel" onclick="closeModal('acceptModal')">
+                                ANNULER
+                            </button>
+                            <button class="modal-btn modal-btn-accept" onclick="confirmAccept('${proposal.id}')">
+                                ✅ VALIDER L'ACCEPTATION
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Update character count
+            const textarea = document.getElementById('modal-accept-message');
+            const charCount = document.getElementById('accept-char-count');
+            const updateCount = () => {
+                charCount.textContent = textarea.value.length;
+            };
+            textarea.addEventListener('input', updateCount);
+            updateCount();
+            
+            // Close on overlay click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal('acceptModal');
+                }
+            });
+        }
+        
+        function showRejectModal(proposal) {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay active';
+            modal.id = 'rejectModal';
+            
+            modal.innerHTML = `
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3>❌ Refuser la proposition</h3>
+                        <div class="modal-subheader">Envoyez un message personnalisé</div>
+                        <button class="modal-close" onclick="closeModal('rejectModal')">×</button>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <div class="modal-section">
+                            <div class="modal-section-title">📋 Informations du joueur</div>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">Pseudo</div>
+                                    <div class="info-value">${proposal.pseudo}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Email</div>
+                                    <div class="info-value">${proposal.email}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Jeu</div>
+                                    <div class="info-value">${proposal.gameName}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Date proposée</div>
+                                    <div class="info-value">${formatDate(proposal.date)} à ${proposal.time}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="modal-section">
+                            <div class="modal-section-title">✉️ Raison du refus</div>
+                            
+                            <div class="modal-form-group">
+                                <label>MODÈLE DE MESSAGE</label>
+                                <select id="reject-template" onchange="updateRejectMessage('${proposal.pseudo}', '${proposal.gameName}')">
+                                    <option value="custom">Message personnalisé</option>
+                                    <option value="busy">Déjà occupé ce jour-là</option>
+                                    <option value="schedule">Planning trop chargé</option>
+                                    <option value="game">Ne joue pas à ce jeu actuellement</option>
+                                    <option value="later">Peut-être plus tard</option>
+                                </select>
+                            </div>
+                            
+                            <div class="modal-form-group">
+                                <label>MESSAGE PERSONNALISÉ</label>
+                                <textarea id="modal-reject-message" rows="6" maxlength="500">Salut ${proposal.pseudo},
+
+Merci pour ta proposition pour jouer à ${proposal.gameName} !
+
+Malheureusement, je ne peux pas accepter cette session pour le moment.
+
+N'hésite pas à me reproposer une autre date ! 😊</textarea>
+                                <div class="char-count"><span id="reject-char-count">0</span>/500</div>
+                            </div>
+                            
+                            <div class="message-preview">
+                                <strong>Aperçu :</strong><br>
+                                Le message sera envoyé à ${proposal.email}
+                            </div>
+                        </div>
+                        
+                        <div class="modal-actions">
+                            <button class="modal-btn modal-btn-cancel" onclick="closeModal('rejectModal')">
+                                ANNULER
+                            </button>
+                            <button class="modal-btn modal-btn-reject" onclick="confirmReject('${proposal.id}')">
+                                ❌ CONFIRMER LE REFUS
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Update character count
+            const textarea = document.getElementById('modal-reject-message');
+            const charCount = document.getElementById('reject-char-count');
+            const updateCount = () => {
+                charCount.textContent = textarea.value.length;
+            };
+            textarea.addEventListener('input', updateCount);
+            updateCount();
+            
+            // Close on overlay click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal('rejectModal');
+                }
+            });
+        }
+        
+        function updateRejectMessage(pseudo, gameName) {
+            const template = document.getElementById('reject-template').value;
+            const textarea = document.getElementById('modal-reject-message');
+            
+            const templates = {
+                busy: `Salut ${pseudo},
+
+Merci pour ta proposition pour jouer à ${gameName} !
+
+Je suis déjà occupé à cette date malheureusement. 
+
+Repropose-moi une autre date si tu veux ! 😊`,
+                schedule: `Hey ${pseudo} !
+
+Merci pour l'invitation à ${gameName} !
+
+Mon planning est un peu chargé en ce moment, je ne peux pas m'engager sur cette session.
+
+On se refait ça bientôt ! 🎮`,
+                game: `Salut ${pseudo},
+
+Merci pour ta proposition !
+
+Je ne joue pas trop à ${gameName} en ce moment, du coup je vais passer pour cette session.
+
+Hésite pas à proposer d'autres jeux ! 👍`,
+                later: `Hey ${pseudo} !
+
+Merci pour l'invitation à ${gameName} !
+
+Je ne peux pas pour cette fois-ci, mais n'hésite pas à me reproposer plus tard !
+
+À bientôt ! 🎮`
+            };
+            
+            if (template !== 'custom' && templates[template]) {
+                textarea.value = templates[template];
+                // Trigger input event to update character count
+                textarea.dispatchEvent(new Event('input'));
+            }
+        }
+        
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => {
+                    modal.remove();
+                }, 300);
+            }
+        }
+        
+        function confirmAccept(id) {
+            const proposal = proposals.find(p => p && p.id === id);
+            if (!proposal) {
+                showNotification('❌ Proposition introuvable', 'error');
+                return;
+            }
+            
+            // Récupérer les données modifiées
+            const newDate = document.getElementById('modal-accept-date').value;
+            const newTime = document.getElementById('modal-accept-time').value;
+            const message = document.getElementById('modal-accept-message').value;
+            
+            // Mettre à jour la proposition
+            proposal.status = 'accepted';
+            proposal.date = newDate;
+            proposal.time = newTime;
+            proposal.acceptMessage = message;
+            
+            saveProposals();
+            syncWithGoogleSheets('update', {
+                id: proposal.id,
+                status: 'accepted',
+                pseudo: proposal.pseudo,
+                gameName: proposal.gameName,
+                date: newDate,
+                time: newTime
+            });
+            
+            closeModal('acceptModal');
+            render();
+            
+            showNotification(`✅ Session avec ${proposal.pseudo} acceptée !`, 'success');
+            console.log('📧 Message à envoyer:', message);
+            console.log('📧 Destinataire:', proposal.email);
+        }
+        
+        function confirmReject(id) {
+            const proposal = proposals.find(p => p && p.id === id);
+            if (!proposal) {
+                showNotification('❌ Proposition introuvable', 'error');
+                return;
+            }
+            
+            // Récupérer le message
+            const message = document.getElementById('modal-reject-message').value;
+            
+            // Mettre à jour la proposition
+            proposal.status = 'rejected';
+            proposal.rejectMessage = message;
+            
+            saveProposals();
+            syncWithGoogleSheets('update', {
+                id: proposal.id,
+                status: 'rejected',
+                pseudo: proposal.pseudo,
+                gameName: proposal.gameName,
+                date: proposal.date,
+                time: proposal.time
+            });
+            
+            closeModal('rejectModal');
+            render();
+            
+            showNotification(`Session avec ${proposal.pseudo} refusée`, 'success');
+            console.log('📧 Message de refus à envoyer:', message);
+            console.log('📧 Destinataire:', proposal.email);
         }
 
         function logout() {
@@ -1176,6 +1701,10 @@
         window.acceptProposal = acceptProposal;
         window.rejectProposal = rejectProposal;
         window.testGoogleSheets = testGoogleSheets;
+        window.closeModal = closeModal;
+        window.confirmAccept = confirmAccept;
+        window.confirmReject = confirmReject;
+        window.updateRejectMessage = updateRejectMessage;
     </script>
 </body>
 </html>
