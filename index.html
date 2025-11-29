@@ -1573,21 +1573,26 @@ Je ne peux pas pour cette fois-ci, mais n'hésite pas à me reproposer plus tard
             proposal.acceptMessage = message;
             
             saveProposals();
+            
+            // Envoyer à Google Sheets avec le message pour Discord
             syncWithGoogleSheets('update', {
                 id: proposal.id,
                 status: 'accepted',
                 pseudo: proposal.pseudo,
                 gameName: proposal.gameName,
-                date: newDate,
-                time: newTime
+                date: proposal.date,
+                time: proposal.time,
+                newDate: newDate,
+                newTime: newTime,
+                message: message
             });
             
             closeModal('acceptModal');
             render();
             
-            showNotification(`✅ Session avec ${proposal.pseudo} acceptée !`, 'success');
-            console.log('📧 Message à envoyer:', message);
-            console.log('📧 Destinataire:', proposal.email);
+            showNotification(`✅ Session acceptée ! DM Discord envoyé à @${proposal.pseudo}`, 'success');
+            console.log('📧 Message Discord à envoyer:', message);
+            console.log('📧 Destinataire Discord:', '@' + proposal.pseudo);
         }
         
         function confirmReject(id) {
@@ -1605,21 +1610,24 @@ Je ne peux pas pour cette fois-ci, mais n'hésite pas à me reproposer plus tard
             proposal.rejectMessage = message;
             
             saveProposals();
+            
+            // Envoyer à Google Sheets avec le message pour Discord
             syncWithGoogleSheets('update', {
                 id: proposal.id,
                 status: 'rejected',
                 pseudo: proposal.pseudo,
                 gameName: proposal.gameName,
                 date: proposal.date,
-                time: proposal.time
+                time: proposal.time,
+                message: message
             });
             
             closeModal('rejectModal');
             render();
             
-            showNotification(`Session avec ${proposal.pseudo} refusée`, 'success');
-            console.log('📧 Message de refus à envoyer:', message);
-            console.log('📧 Destinataire:', proposal.email);
+            showNotification(`Session refusée - DM Discord envoyé à @${proposal.pseudo}`, 'success');
+            console.log('📧 Message de refus Discord:', message);
+            console.log('📧 Destinataire Discord:', '@' + proposal.pseudo);
         }
 
         function logout() {
